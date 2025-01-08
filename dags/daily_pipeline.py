@@ -169,7 +169,7 @@ def s3_decorator(bucket, folder, minio_credentials_variable, pg_database, pg_sch
     folder = 'orders', 
     minio_credentials_variable = 'minio_api_key', 
     pg_database = 'warehouse', 
-    pg_schema = 'sales', 
+    pg_schema = 'staging', 
     pg_table = 'stg_orders'
 )
 def _load_orders(data_list):
@@ -189,7 +189,7 @@ def _load_orders(data_list):
     folder = 'traffic', 
     minio_credentials_variable = 'minio_api_key', 
     pg_database = 'warehouse', 
-    pg_schema = 'website', 
+    pg_schema = 'staging', 
     pg_table = 'stg_traffic'
 )
 def _load_web_traffic(data_list):
