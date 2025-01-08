@@ -1,0 +1,13 @@
+{
+    "db_credentials": {
+        "host": "postgres-dw",
+        "port": "5432",
+        "user": "dw_user",
+        "password": "dw_password"
+    },
+    "minio_api_key": {
+        "endpoint_url": "http://airflow-project-minio-1:9000/",
+        "access_key": "a8RFHKKMzkBiY0pOqsge",
+        "secret_key": "a7CGWoRiP5PEGMFOJDdz2xZldRzVF57gpuC6WRIX"
+    }
+}

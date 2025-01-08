@@ -1,0 +1,10 @@
+{
+    "db_credentials": {
+        "conn_id": "postgres-dw",
+        "host": "postgres-dw",
+        "port": "5432",
+        "user": "dw_user",
+        "password": "dw_password",
+        "database": "warehouse"
+    }
+}
