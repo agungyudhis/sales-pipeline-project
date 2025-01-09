@@ -65,6 +65,75 @@ def product_generator() -> pl.DataFrame:
     return pl.DataFrame(product)
 
 
+def _dim_date_init():
+    from datetime import date
+
+    import polars as pl
+
+    START_YEAR = 2020
+    END_YEAR = 2030
+
+    # Create sqlsalchemy engine to connect the postgres db
+    engine = create_engine(cred_variable="db_credentials", database="warehouse")
+
+    date_dimension = (
+        pl.date_range(
+            date(START_YEAR, 1, 1),
+            date(END_YEAR, 1, 1),
+            "1d",
+            closed="left",
+            eager=True,
+        )
+        .alias("date_temp")
+        .to_frame()
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.strftime(r"%Y%m%d").cast(pl.Int32)).alias("date_id")
+    )
+    date_dimension = date_dimension.with_columns((pl.col("date_temp")).alias("date"))
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.strftime(r"%A, %-d %B %Y")).alias(
+            "full_date_description"
+        )
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.year()).alias("year")
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.quarter()).alias("quarter")
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.month()).alias("month")
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.day()).alias("day")
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.strftime(r"%u").cast(pl.Int32)).alias("day_of_week")
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.strftime(r"%A")).alias("calendar_day_of_week")
+    )
+    date_dimension = date_dimension.with_columns(
+        (pl.col("date_temp").dt.strftime(r"%B")).alias("calendar_month")
+    )
+    date_dimension = date_dimension.with_columns(
+        pl.col("day_of_week")
+        .map_elements(
+            lambda x: "Weekend" if x in [6, 7] else "Weekday", return_dtype=pl.String
+        )
+        .alias("is_weekend")
+    )
+    date_dimension = date_dimension.drop(["date_temp"])
+
+    with engine.connect() as connection:
+        date_dimension.write_database(
+            table_name="staging.stg_dim_date",
+            connection=connection,
+            if_table_exists="replace",
+        )
+    return None
+
 def _customer_init():
     import polars as pl
 
@@ -130,4 +199,18 @@ with DAG(
         execution_timeout=timedelta(minutes=4),
     )
 
-    synthetic_db_init >> [customer_init, product_init]
+    dim_date_init = PythonOperator(
+        task_id="dim_date_init",
+        python_callable=_dim_date_init,
+        execution_timeout=timedelta(minutes=4),
+    )
+
+    transform_stg_dim_date = SQLExecuteQueryOperator(
+        task_id="transform_stg_dim_date",
+        sql="dim_date_init.sql",
+        conn_id="postgres-dw",
+        execution_timeout=timedelta(minutes=2),
+    )
+
+    synthetic_db_init >> [customer_init, product_init, dim_date_init]
+    dim_date_init >> transform_stg_dim_date
