@@ -225,6 +225,7 @@ services:
       MINIO_ADDRESS: ':9000'
       MINIO_CONSOLE_ADDRESS: ':9001'
     command: minio server /data
+    restart: always
 
   postgres-dw:
     container_name: postgres-dw
