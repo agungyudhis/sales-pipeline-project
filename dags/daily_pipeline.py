@@ -11,7 +11,8 @@ from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import BranchPythonOperator, PythonOperator
 from connection import create_engine
 from data_generator import generate_orders, generate_traffic_data
-
+from airflow.utils.task_group import TaskGroup
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 def upload_to_minio(bucket, folder, data, filename):
     import io
@@ -259,5 +260,45 @@ with DAG(
 
     skip_empty = EmptyOperator(task_id="skip_empty_data")
 
+    with TaskGroup(group_id='sales_dim_update') as sales_dim_update:
+        dim_location_update = SQLExecuteQueryOperator(
+            task_id="dim_location_update",
+            sql="dim_location_update.sql",
+            conn_id="postgres-dw",
+            execution_timeout=timedelta(minutes=15),
+        )
+        
+        dim_customer_update = SQLExecuteQueryOperator(
+            task_id="dim_customer_update",
+            sql="dim_customer_update.sql",
+            conn_id="postgres-dw",
+            execution_timeout=timedelta(minutes=15),
+        )
+        
+        dim_product_update = SQLExecuteQueryOperator(
+            task_id="dim_product_update",
+            sql="dim_product_update.sql",
+            conn_id="postgres-dw",
+            execution_timeout=timedelta(minutes=15),
+        )
+
+    with TaskGroup(group_id='web_dim_update') as web_dim_update:
+        dim_device_update = SQLExecuteQueryOperator(
+            task_id="dim_device_update",
+            sql="dim_device_update.sql",
+            conn_id="postgres-dw",
+            execution_timeout=timedelta(minutes=15),
+        )
+        
+        dim_channel_update = SQLExecuteQueryOperator(
+            task_id="dim_channel_update",
+            sql="dim_channel_update.sql",
+            conn_id="postgres-dw",
+            execution_timeout=timedelta(minutes=15),
+        )
+            
     extract_orders >> [load_orders, skip_empty]
     extract_web_traffic >> [load_web_traffic, skip_empty]
+
+    load_orders >> sales_dim_update
+    load_web_traffic >> web_dim_update

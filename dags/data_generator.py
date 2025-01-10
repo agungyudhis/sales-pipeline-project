@@ -136,6 +136,9 @@ def generate_orders(start: datetime, end: datetime):
             pl.col("item").explode().alias("item_list"),
         )
         .sort("order_time")
+        .with_columns(
+            pl.col('order_time').alias('updated_at')
+        )
     )
 
     # Convert the data to python dictionary
@@ -198,7 +201,7 @@ def generate_traffic_data(start: datetime, end: datetime):
         pl.col("traffic_source")
         .map_elements(
             lambda x: (
-                np.random.choice(REFERRAL_SOURCE_LIST) if x == "Referral" else None
+                np.random.choice(REFERRAL_SOURCE_LIST) if x == "Referral" else "-"
             ),
             return_dtype=pl.String,
         )

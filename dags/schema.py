@@ -23,6 +23,7 @@ class Orders(BaseModel):
     place: str = None
     country: str = None
     item_list: List[Item]
+    updated_at: int
     
 class Visitors(BaseModel):
     session_id: str
@@ -31,6 +32,8 @@ class Visitors(BaseModel):
     session_duration: float
     clicks: int = 0
     traffic_source: str = "Unknown"
+    referral_source: str = "-"
     device: str = "Unknown"
+    os: str = "Unknown"
     browser: str = "Unknown"
     transaction: int = 0
