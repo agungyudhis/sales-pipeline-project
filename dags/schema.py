@@ -2,6 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
+
 class Item(BaseModel):
     line_item_id: str
     sku_id: str
@@ -12,6 +13,7 @@ class Item(BaseModel):
     price: float
     cogs: float
     quantity: int
+
 
 class Orders(BaseModel):
     order_id: str
@@ -24,7 +26,8 @@ class Orders(BaseModel):
     country: str = None
     item_list: List[Item]
     updated_at: int
-    
+
+
 class Visitors(BaseModel):
     session_id: str
     visit_time: int
@@ -36,4 +39,4 @@ class Visitors(BaseModel):
     device: str = "Unknown"
     os: str = "Unknown"
     browser: str = "Unknown"
-    transaction: int = 0
+    transactions: int = 0
