@@ -44,23 +44,6 @@ CREATE TABLE sales.dim_customer (
 	updated_at timestamp
 );
 
-CREATE TABLE sales.fct_sales (
-	line_item_id char(26) primary key,
-	order_id char(26),
-	customer_id serial REFERENCES sales.dim_customer (customer_id),
-	product_id serial REFERENCES sales.dim_sku (sku_id),
-	location_id serial REFERENCES public.dim_location (location_id),
-	order_date_id int4,
-	order_time timestamp,
-	quantity int4,
-	revenue numeric,
-	net_sales numeric,
-	gross_profit numeric,
-	created_at timestamp,
-	updated_at timestamp
-);
-
-
 -- SCD Type 0: Retain original
 CREATE TABLE website.dim_device (
 	device_id serial primary key,
@@ -83,3 +66,34 @@ CREATE TABLE website.dim_channel (
 -- Create constraint unique index
 CREATE UNIQUE INDEX idx_dim_channel_unique
 ON website.dim_channel (traffic_source, referral_source);
+
+-- Sales fact table
+CREATE TABLE sales.fct_sales (
+	line_item_id char(26) primary key,
+	order_id char(26),
+	sku_id serial REFERENCES sales.dim_sku (sku_id),
+	customer_id serial REFERENCES sales.dim_customer (customer_id),
+	location_id serial REFERENCES public.dim_location (location_id),
+	order_date_id int4,
+	order_time timestamp,
+	quantity int4,
+	revenue numeric,
+	gross_profit numeric,
+	created_at timestamp,
+	updated_at timestamp
+);
+
+-- Website traffic fact table
+CREATE TABLE website.fct_traffic (
+	session_id char(26) primary key,
+	channel_id serial REFERENCES website.dim_channel (channel_id),
+	device_id serial REFERENCES website.dim_device (device_id),
+	visit_date_id int4,
+	visit_time timestamp,
+	page_views int4,
+	session_duration numeric,
+	clicks int4,
+	transactions int4,
+	created_at timestamp,
+	updated_at timestamp
+);
