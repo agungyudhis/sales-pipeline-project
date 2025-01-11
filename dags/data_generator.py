@@ -26,9 +26,9 @@ def generate_orders(start: datetime, end: datetime):
     # Const for data generator
     OPENING_DATE = datetime(
         2021, 1, 1
-    )                           # Store opening date (for growth rate calculation)
-    INITIAL_CUST_MEAN = 2       # Poisson lambda rate for number of customer at opening time
-    ANNUAL_GROWTH_RATE = 0.1    # Simple annual growth rate
+    )  # Store opening date (for growth rate calculation)
+    INITIAL_CUST_MEAN = 50  # Poisson lambda rate for number of customer at opening time
+    ANNUAL_GROWTH_RATE = 0.1  # Simple annual growth rate
     PRODUCT_PROB = 0.8
     QUANTITY_PROB = 0.8
 
@@ -136,9 +136,7 @@ def generate_orders(start: datetime, end: datetime):
             pl.col("item").explode().alias("item_list"),
         )
         .sort("order_time")
-        .with_columns(
-            pl.col('order_time').alias('updated_at')
-        )
+        .with_columns(pl.col("order_time").alias("updated_at"))
     )
 
     # Convert the data to python dictionary
@@ -150,8 +148,8 @@ def generate_orders(start: datetime, end: datetime):
 
 
 def generate_traffic_data(start: datetime, end: datetime):
-    import polars as pl
     import numpy as np
+    import polars as pl
     from ulid import ULID
 
     # Const for data generator
