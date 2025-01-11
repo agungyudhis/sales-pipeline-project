@@ -27,7 +27,7 @@ def generate_orders(start: datetime, end: datetime):
     OPENING_DATE = datetime(
         2021, 1, 1
     )  # Store opening date (for growth rate calculation)
-    INITIAL_CUST_MEAN = 50  # Poisson lambda rate for number of customer at opening time
+    INITIAL_AVG_CUST = 50  # Poisson lambda rate for number of customer at opening time
     ANNUAL_GROWTH_RATE = 0.1  # Simple annual growth rate
     PRODUCT_PROB = 0.8
     QUANTITY_PROB = 0.8
@@ -40,7 +40,7 @@ def generate_orders(start: datetime, end: datetime):
     growth_multiplier = growth_factor(start, OPENING_DATE, ANNUAL_GROWTH_RATE)
 
     # Randomize number of customers based on initial customer rate multiplied by growth multiplier
-    num_of_cust = np.random.poisson(INITIAL_CUST_MEAN * growth_multiplier)
+    num_of_cust = np.random.poisson(INITIAL_AVG_CUST * growth_multiplier)
 
     # Connect to db
     with engine.connect() as connection:
@@ -156,12 +156,12 @@ def generate_traffic_data(start: datetime, end: datetime):
     OPENING_DATE = datetime(
         2021, 1, 1
     )  # Web accessible date (for growth rate calculation)
-    INITIAL_VISITOR_MEAN = 10  # Poisson lambda for number of visitors at opening time
+    INITIAL_AVG_VISITOR = 10  # Poisson lambda for number of visitors at opening time
     ANNUAL_GROWTH_RATE = 0.1  # Simple annual growth rate
-    PAGE_VIEWS_MEAN = 3
-    SESSION_DURATION_MEAN = 10
-    CLICKS_MEAN = 10
-    TRANSACTION_MEAN = 0.2
+    PAGE_AVG_VIEWS = 3
+    SESSION_AVG_DURATION = 10
+    AVG_CLICKS = 10
+    AVG_TRANSACTION = 0.2
     TRAFFIC_SOURCE_LIST = ["Direct", "Social", "Paid", "Referral", "Organic"]
     REFERRAL_SOURCE_LIST = ["m.facebook.com", "youtube.com", "instagram.com", "x.com"]
     DEVICE_LIST = ["Desktop", "Mobile"]
@@ -178,18 +178,18 @@ def generate_traffic_data(start: datetime, end: datetime):
     # Calculate growth multiplier
     growth_multiplier = growth_factor(start, OPENING_DATE, ANNUAL_GROWTH_RATE)
     sample_size = int(
-        round(np.random.poisson(INITIAL_VISITOR_MEAN) * growth_multiplier, 0)
+        round(np.random.poisson(INITIAL_AVG_VISITOR) * growth_multiplier, 0)
     )
 
     web_traffic = {
         "visit_time": np.random.uniform(unix_start, unix_end, sample_size),
-        "page_views": np.random.poisson(PAGE_VIEWS_MEAN, sample_size),
-        "session_duration": np.random.exponential(SESSION_DURATION_MEAN, sample_size),
-        "clicks": np.random.poisson(CLICKS_MEAN, sample_size),
+        "page_views": np.random.poisson(PAGE_AVG_VIEWS, sample_size),
+        "session_duration": np.random.exponential(SESSION_AVG_DURATION, sample_size),
+        "clicks": np.random.poisson(AVG_CLICKS, sample_size),
         "traffic_source": np.random.choice(TRAFFIC_SOURCE_LIST, sample_size),
         "device": np.random.choice(DEVICE_LIST, sample_size),
         "browser": np.random.choice(BROWSER_LIST, sample_size),
-        "transactions": np.random.poisson(TRANSACTION_MEAN, sample_size),
+        "transactions": np.random.poisson(AVG_TRANSACTION, sample_size),
     }
     traffic_data = pl.DataFrame(web_traffic).with_columns(
         pl.col("visit_time").cast(pl.Int32),
