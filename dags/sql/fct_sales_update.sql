@@ -37,7 +37,6 @@ WITH new_data AS (
     ON
         so.customer_id = dc.customer_bk
         AND so."name" = dc.customer_name
-        AND dl.location_id = dc.location_id
         AND dc.current_row_indicator = 'Active'
     LEFT JOIN sales.dim_sku ds
     ON

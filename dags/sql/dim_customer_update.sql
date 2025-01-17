@@ -1,7 +1,6 @@
 INSERT INTO sales.dim_customer (
 	customer_bk,
 	customer_name,
-	location_id,
 	row_eff_time,
 	current_row_indicator,
 	updated_at
@@ -9,23 +8,16 @@ INSERT INTO sales.dim_customer (
 SELECT DISTINCT
 	so.customer_id AS customer_bk,
 	so.name AS customer_name,
-	dl.location_id,
 	MAX(TO_TIMESTAMP(so.updated_at)) AS row_eff_time,
 	'Active' AS current_row_indicator,
 	MAX(TO_TIMESTAMP(so.updated_at)) AS updated_at
 FROM staging.stg_orders so
-LEFT JOIN public.dim_location dl
-ON so.place = dl.place
-	AND so.country = dl.country
-	AND so.latitude = dl.latitude
-	AND so.longitude = dl.longitude
 LEFT JOIN sales.dim_customer dc 
 ON so.customer_id = dc.customer_bk
 WHERE (
-		dl.location_id is distinct from dc.location_id
-		OR so.name is distinct from dc.customer_name
+		so.name is distinct from dc.customer_name
 	)
-GROUP BY so.customer_id, so.name, dl.location_id
+GROUP BY so.customer_id, so.name
 ;
 
 UPDATE sales.dim_customer dc 

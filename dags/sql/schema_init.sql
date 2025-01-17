@@ -36,7 +36,6 @@ ON public.dim_location (country, place, longitude, latitude);
 CREATE TABLE sales.dim_customer (
 	customer_id serial primary key,
 	customer_bk char(11),
-	location_id serial REFERENCES public.dim_location (location_id),
 	customer_name text,
 	row_eff_time timestamp,
 	row_exp_time timestamp,
