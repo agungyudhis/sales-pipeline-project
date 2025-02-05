@@ -160,7 +160,7 @@ def generate_traffic_data(start: datetime, end: datetime):
     ANNUAL_GROWTH_RATE = 0.1  # Simple annual growth rate
     PAGE_AVG_VIEWS = 3
     SESSION_AVG_DURATION = 10
-    AVG_CLICKS = 10
+    AVG_CLICKS = 2
     AVG_TRANSACTION = 0.2
     TRAFFIC_SOURCE_LIST = ["Direct", "Social", "Paid", "Referral", "Organic"]
     REFERRAL_SOURCE_LIST = ["m.facebook.com", "youtube.com", "instagram.com", "x.com"]
