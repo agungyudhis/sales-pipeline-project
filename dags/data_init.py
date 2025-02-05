@@ -180,8 +180,15 @@ with DAG(
     template_searchpath="/opt/airflow/dags/sql",
 ) as dag:
 
-    synthetic_db_init = SQLExecuteQueryOperator(
-        task_id="synthetic_db_init",
+    synthetic_init = SQLExecuteQueryOperator(
+        task_id="synthetic_init",
+        sql="synthetic_init.sql",
+        conn_id="postgres-dw",
+        execution_timeout=timedelta(minutes=2),
+    )
+
+    warehouse_init = SQLExecuteQueryOperator(
+        task_id="warehouse_init",
         sql="schema_init.sql",
         conn_id="postgres-dw",
         execution_timeout=timedelta(minutes=2),
@@ -212,5 +219,5 @@ with DAG(
         execution_timeout=timedelta(minutes=2),
     )
 
-    synthetic_db_init >> [customer_init, product_init, dim_date_init]
-    dim_date_init >> transform_stg_dim_date
+    synthetic_init >> [customer_init, product_init]
+    warehouse_init >> dim_date_init >> transform_stg_dim_date

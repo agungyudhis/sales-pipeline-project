@@ -1,4 +1,3 @@
-CREATE SCHEMA synthetic;
 CREATE SCHEMA staging;
 CREATE SCHEMA sales;
 CREATE SCHEMA website;
