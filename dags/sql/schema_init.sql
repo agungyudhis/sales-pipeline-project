@@ -3,6 +3,22 @@ CREATE SCHEMA staging;
 CREATE SCHEMA sales;
 CREATE SCHEMA website;
 
+CREATE TABLE IF NOT EXISTS public.dim_date (
+    date_id int4 primary key,
+    date date,
+    full_date_description text DEFAULT 'Not Entered',
+    year int2,
+    quarter int2,
+    month int2,
+    day int2,
+    day_of_week int2,
+    calendar_day_of_week text,
+    calendar_month text,
+    is_weekend text DEFAULT 'Weekday',
+    event_name text DEFAULT '-',
+    is_holiday text DEFAULT 'Non-Holiday'
+);
+
 -- SCD Type 2: Add new row
 CREATE TABLE sales.dim_sku (
 	sku_id serial primary key,
@@ -73,7 +89,7 @@ CREATE TABLE sales.fct_sales (
 	sku_id serial REFERENCES sales.dim_sku (sku_id),
 	customer_id serial REFERENCES sales.dim_customer (customer_id),
 	location_id serial REFERENCES public.dim_location (location_id),
-	order_date_id int4,
+	order_date_id int4 REFERENCES public.dim_date (date_id),
 	order_time timestamp,
 	quantity int4,
 	revenue numeric,
@@ -87,7 +103,7 @@ CREATE TABLE website.fct_traffic (
 	session_id char(26) primary key,
 	channel_id serial REFERENCES website.dim_channel (channel_id),
 	device_id serial REFERENCES website.dim_device (device_id),
-	visit_date_id int4,
+	visit_date_id int4 REFERENCES public.dim_date (date_id),
 	visit_time timestamp,
 	page_views int4,
 	session_duration numeric,
@@ -95,4 +111,19 @@ CREATE TABLE website.fct_traffic (
 	transactions int4,
 	created_at timestamp,
 	updated_at timestamp
+);
+
+-- Periodic summary fact table
+CREATE TABLE public.fct_periodic_summary (
+	date_id int4 primary key REFERENCES public.dim_date (date_id),
+	unique_orders int4,
+	unique_customers int4,
+	quantity int4,
+	revenue int4,
+	gross_profit int4,
+	page_views int4,
+	num_sessions int4,
+	session_duration int4,
+	clicks int4,
+	transactions int4
 );

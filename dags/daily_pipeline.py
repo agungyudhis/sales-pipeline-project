@@ -315,8 +315,18 @@ with DAG(
         execution_timeout=timedelta(minutes=15),
     )
 
+    fct_periodic_summary_update = SQLExecuteQueryOperator(
+        task_id="fct_periodic_summary_update",
+        sql="fct_periodic_summary_update.sql",
+        conn_id="postgres-dw",
+        execution_timeout=timedelta(minutes=15),
+        trigger_rule='none_failed'
+    )
+
     extract_orders >> [load_orders, skip_empty]
     extract_web_traffic >> [load_web_traffic, skip_empty]
 
     load_orders >> sales_dim_update >> fct_sales_update
     load_web_traffic >> web_dim_update >> fct_traffic_update
+    
+    [fct_sales_update, fct_traffic_update] >> fct_periodic_summary_update

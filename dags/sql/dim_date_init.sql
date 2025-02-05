@@ -1,19 +1,3 @@
-CREATE TABLE IF NOT EXISTS public.dim_date (
-    date_id int4 primary key,
-    date date,
-    full_date_description text DEFAULT 'Not Entered',
-    year int2,
-    quarter int2,
-    month int2,
-    day int2,
-    day_of_week int2,
-    calendar_day_of_week text,
-    calendar_month text,
-    is_weekend text DEFAULT 'Weekday',
-    event_name text DEFAULT '-',
-    is_holiday text DEFAULT 'Non-Holiday'
-);
-
 INSERT INTO public.dim_date (
     date_id,
     date,
