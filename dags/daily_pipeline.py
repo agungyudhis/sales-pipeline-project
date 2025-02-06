@@ -131,7 +131,7 @@ def s3_decorator(
                         s3.put_object(
                             Bucket="archive",
                             Key=file["Key"],
-                            Body=response_object["Body"].read(),
+                            Body=json.dumps(data_list),
                         )
 
                 # Create sqlsalchemy engine to connect the postgres db
