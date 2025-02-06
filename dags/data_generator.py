@@ -142,7 +142,6 @@ def generate_orders(start: datetime, end: datetime):
     # Convert the data to python dictionary
     return {
         "order_count": orders.shape[0],
-        "order_date": datetime.today().strftime(r"%Y-%m-%d"),
         "orders": orders.to_dicts(),
     }
 
@@ -210,6 +209,5 @@ def generate_traffic_data(start: datetime, end: datetime):
     )
     return {
         "visitor_count": traffic_data.shape[0],
-        "visit_date": datetime.today().strftime(r"%Y-%m-%d"),
         "visitors": traffic_data.to_dicts(),
     }
