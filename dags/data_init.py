@@ -182,7 +182,7 @@ with DAG(
 
     synthetic_init = SQLExecuteQueryOperator(
         task_id="synthetic_init",
-        sql="synthetic_init.sql",
+        sql="CREATE SCHEMA synthetic;",
         conn_id="postgres-dw",
         execution_timeout=timedelta(minutes=2),
     )
